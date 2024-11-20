@@ -49,6 +49,16 @@ function onInput (event: Event) {
     onCaretMove();
   });
 }
+function onDelete (event: KeyboardEvent) {
+  if (
+    !formattedUserInput.value.length &&
+    event.key === 'Backspace'
+  ) {
+    // For some reason loses focus if
+    // the Backspace pressed on empty input
+    event.preventDefault();
+  }
+}
 async function onCaretMove () {
   const element = caret.getElement();
   if (!element) {
@@ -102,6 +112,7 @@ async function setOptionsState (element: HTMLElement, markdownParams: Required<M
     @input="onInput"
     @keydown.left="onCaretMove"
     @keydown.right="onCaretMove"
+    @keydown.delete="onDelete"
     @paste.prevent
     @keydown.enter.prevent
     @keydown.up.prevent
