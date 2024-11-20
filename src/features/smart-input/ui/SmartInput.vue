@@ -30,39 +30,50 @@ function onInput (event: Event) {
 <template>
   <div
     ref="inputRef"
-    :key="inputHash"
     class="smart-input"
-    role="textbox"
-    contenteditable
     @input="onInput"
     @paste.prevent
     @keydown.enter.prevent
     @keydown.up.prevent
     @keydown.down.prevent
   >
-    <template
-      v-for="(item, idx) in formattedUserInput"
-      :key="idx"
+    <div
+      :key="inputHash"
+      class="textbox"
+      role="textbox"
+      contenteditable
     >
-      <span
-        v-if="item.markdown"
-        v-text="item.text"
-        :class="item.markdown.classList"
-        :data-markdown-type="item.markdown.name"
-      />
-      <span
-        v-else
-        v-text="item.text"
-      />
-    </template>
+      <template
+        v-for="(item, idx) in formattedUserInput"
+        :key="idx"
+      >
+        <span
+          v-if="item.markdown"
+          v-text="item.text"
+          :class="item.markdown.classList"
+          :data-markdown-type="item.markdown.name"
+        />
+        <span
+          v-else
+          v-text="item.text"
+        />
+      </template>
+    </div>
   </div>
 </template>
 
 <style scoped lang="postcss">
 .smart-input {
   @apply
-    w-full max-w-xl p-4 border-2 rounded-lg
-    text-gray-500 focus:outline-none focus:border-indigo-400
+    w-full max-w-xl
+    border-2 rounded-lg
+    text-gray-500
     cursor-text;
+}
+.textbox {
+  @apply
+    p-4
+    focus:outline-none
+    focus:border-indigo-400
 }
 </style>
