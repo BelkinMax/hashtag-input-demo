@@ -22,6 +22,6 @@ const userInput = ref('Hi #everyone! What do you think about #this?');
 }
 .original-text {
   @apply
-    text-sm text-gray-500;
+    text-sm text-gray-300;
 }
 </style>

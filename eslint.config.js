@@ -64,6 +64,9 @@ export default [
   {
     ...pluginVitest.configs.recommended,
     files: ['src/**/__tests__/*'],
+    rules: {
+      'vitest/expect-expect': 'off',
+    },
   },
 
   {

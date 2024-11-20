@@ -19,6 +19,10 @@ function onInput (event: Event) {
     role="textbox"
     contenteditable
     @input="onInput"
+    @paste.prevent
+    @keydown.enter.prevent
+    @keydown.up.prevent
+    @keydown.down.prevent
   >
     <span v-text="userInput" />
   </div>
@@ -29,6 +33,6 @@ function onInput (event: Event) {
   @apply
     w-full p-4 border-2 rounded-lg
     text-gray-500 focus:outline-none focus:border-indigo-400
-    cursor-text;
+    cursor-text whitespace-pre;
 }
 </style>
