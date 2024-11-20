@@ -4,6 +4,7 @@ import { nextTick, ref } from 'vue';
 import { useCaret, useStringHash } from '~/shared/composables';
 
 import { useMarkdown } from '../composables';
+import InputOptions from './InputOptions.vue';
 
 const inputRef = ref<HTMLElement | null>(null);
 const markdown = useMarkdown();
@@ -14,6 +15,7 @@ const userInput = defineModel<string>({
 });
 const formattedUserInput = markdown.transform(userInput);
 const inputHash = useStringHash(userInput);
+const options = ref<string[]>([]);
 
 function onInput (event: Event) {
   const lastCaretPosition = caret.getPosition();
@@ -59,12 +61,18 @@ function onInput (event: Event) {
         />
       </template>
     </div>
+
+    <InputOptions
+      class="input-options"
+      :options="options"
+    />
   </div>
 </template>
 
 <style scoped lang="postcss">
 .smart-input {
   @apply
+    relative
     w-full max-w-xl
     border-2 rounded-lg
     text-gray-500
@@ -75,5 +83,10 @@ function onInput (event: Event) {
     p-4
     focus:outline-none
     focus:border-indigo-400
+}
+.input-options {
+  @apply
+    absolute
+    top-full mt-2 left-0;
 }
 </style>

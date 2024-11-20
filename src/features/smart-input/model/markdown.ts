@@ -1,8 +1,13 @@
+import { hashtagService } from '~/entities/hashtag';
+
 export interface Markdown {
   name: string;
   pattern: RegExp;
   classList: string[];
   withOptions: boolean;
+  service?: {
+    findMatching (match: string): Promise<string[]>
+  }
 }
 
 export const markdownMap: Markdown[] = [
@@ -11,6 +16,7 @@ export const markdownMap: Markdown[] = [
     pattern: /(#\w+)/,
     classList: ['text-indigo-500'],
     withOptions: true,
+    service: hashtagService,
   },
 ] as const;
 

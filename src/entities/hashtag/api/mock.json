@@ -1,0 +1,14 @@
+{
+  "list": [
+    "liver", "pain", "right", "left", "pancreas", "kidney",
+    "brain", "severe_pain", "tumour", "cancer", "MRI", "CT",
+    "male", "female", "bone", "shoulder", "hip", "XRAY",
+    "knee", "spine", "head", "abdomen", "contrast", "fragment",
+    "detached", "injury", "torn", "rotator", "cuff", "abdominal",
+    "dilatation", "ultrasound", "biopsy", "chemotherapy", "radiation",
+    "metastasis", "lesion", "neurology", "orthopedic", "gastroenterology",
+    "cardiology", "urology", "vascular", "hepatology", "oncology",
+    "endocrinology", "inflammation", "swelling", "fracture", "arthritis",
+    "degenerative", "imaging", "scanning", "biomarker", "hemorrhage", "diagnosis"
+  ]
+}
