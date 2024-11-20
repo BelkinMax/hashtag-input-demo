@@ -23,9 +23,11 @@ const options = ref<string[]>([]);
 const lastOptionsMatch = ref('');
 const isOptionsOpened = ref(false);
 const optionsXPosition = ref(0);
+const selectedOptionIdx = ref(-1);
 const optionsPositionReset = () => {
   isOptionsOpened.value = false;
   optionsXPosition.value = 0;
+  selectedOptionIdx.value = -1;
 };
 
 const isExactOptionMatch = computed(() => (
@@ -60,12 +62,35 @@ function onDelete (event: KeyboardEvent) {
   }
 }
 function onEnter () {
+  const selectedOption = (
+    options.value[selectedOptionIdx.value] ||
+    options.value[0]
+  );
+
+  onOptionSelect(selectedOption);
+}
+function onSelectPrev () {
+  const newIdx = selectedOptionIdx.value - 1;
+  const lastIdx = options.value.length - 1;
+
+  selectedOptionIdx.value = newIdx < 0
+    ? lastIdx
+    : newIdx;
+}
+function onSelectNext () {
+  const newIdx = selectedOptionIdx.value + 1;
+  const lastIdx = options.value.length - 1;
+
+  selectedOptionIdx.value = newIdx > lastIdx
+    ? 0
+    : newIdx;
+}
+function onOptionSelect (selectedOption: string) {
   const element = caret.getElement();
   if (!element || !isOptionsVisible.value) {
     return;
   }
 
-  const selectedOption = options.value[0];
   const currentContent = element.textContent;
   if (!currentContent) {
     return;
@@ -103,8 +128,8 @@ async function onCaretMove () {
 }
 async function setOptionsState (element: HTMLElement, markdownParams: Required<Markdown>) {
   const tag = element.textContent?.trim() || '';
-  const { left } = getElementPositionToParent(element);
   const tagValue = tag.replace(/\W+/g, '');
+  const { left } = getElementPositionToParent(element);
   const openOptions = () => {
     optionsXPosition.value = left;
     isOptionsOpened.value = true;
@@ -139,6 +164,8 @@ function setContent (element: HTMLElement, content: string) {
     @input="onInput"
     @keydown.left="onCaretMove"
     @keydown.right="onCaretMove"
+    @keydown.up="onSelectPrev"
+    @keydown.down="onSelectNext"
     @keydown.delete="onDelete"
     @keydown.enter.prevent="onEnter"
     @paste.prevent
@@ -172,8 +199,10 @@ function setContent (element: HTMLElement, content: string) {
       v-show="isOptionsVisible"
       class="input-options"
       :style="{ left: `${optionsXPosition}px` }"
+      :selected-idx="selectedOptionIdx"
       :match-option="lastOptionsMatch"
       :options="options"
+      @select="onOptionSelect"
     />
   </div>
 </template>
@@ -182,7 +211,7 @@ function setContent (element: HTMLElement, content: string) {
 .smart-input {
   @apply
     relative
-    w-full max-w-xl
+    w-full
     border-2 rounded-lg
     text-gray-500
     cursor-text;
