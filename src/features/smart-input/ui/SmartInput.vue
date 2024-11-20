@@ -1,20 +1,36 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
+
+import { useCaret, useStringHash } from '~/shared/composables';
+
+import { useMarkdown } from '../composables';
+
+const inputRef = ref<HTMLElement | null>(null);
+const markdown = useMarkdown();
+const caret = useCaret(inputRef);
 
 const userInput = defineModel<string>({
   required: true,
 });
-
-const inputRef = ref<HTMLElement | null>(null);
+const formattedUserInput = markdown.transform(userInput);
+const inputHash = useStringHash(userInput);
 
 function onInput (event: Event) {
+  const lastCaretPosition = caret.getPosition();
+
   userInput.value = (event.target as HTMLElement).textContent || '';
+
+  nextTick(() => {
+    // Set the caret to the same position as before the update
+    caret.setPosition(lastCaretPosition);
+  });
 }
 </script>
 
 <template>
   <div
     ref="inputRef"
+    :key="inputHash"
     class="smart-input"
     role="textbox"
     contenteditable
@@ -24,15 +40,29 @@ function onInput (event: Event) {
     @keydown.up.prevent
     @keydown.down.prevent
   >
-    <span v-text="userInput" />
+    <template
+      v-for="(item, idx) in formattedUserInput"
+      :key="idx"
+    >
+      <span
+        v-if="item.markdown"
+        v-text="item.text"
+        :class="item.markdown.classList"
+        :data-markdown-type="item.markdown.name"
+      />
+      <span
+        v-else
+        v-text="item.text"
+      />
+    </template>
   </div>
 </template>
 
 <style scoped lang="postcss">
 .smart-input {
   @apply
-    w-full p-4 border-2 rounded-lg
+    w-full max-w-xl p-4 border-2 rounded-lg
     text-gray-500 focus:outline-none focus:border-indigo-400
-    cursor-text whitespace-pre;
+    cursor-text;
 }
 </style>
