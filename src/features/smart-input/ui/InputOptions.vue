@@ -20,7 +20,10 @@ function onSelect (item: string) {
 </script>
 
 <template>
-  <div class="options-list">
+  <div
+    class="options-list"
+    data-testid="options-list"
+  >
     <button
       v-for="(item, idx) in options"
       :key="item"
@@ -28,6 +31,7 @@ function onSelect (item: string) {
       :class="{
         'selected': idx === selectedIdx
       }"
+      :data-testid="`option-item-${idx}`"
       tabindex="-1"
       @click.stop="onSelect(item)"
     >

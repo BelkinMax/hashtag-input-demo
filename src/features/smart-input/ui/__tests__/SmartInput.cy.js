@@ -28,4 +28,35 @@ describe('SmartInput', () => {
     cy.findByText('#this');
     cy.findByText('?');
   });
+
+  it('select with keyboard', () => {
+    cy.get('[contenteditable]')
+      .type('And what about #b');
+
+    cy.findByTestId('options-list');
+    cy.findByTestId('option-item-0');
+
+    cy.get('[contenteditable]')
+      .type('{enter}?');
+
+    cy.findByText('And what about');
+    cy.findByText('#brain');
+    cy.findByText('?');
+
+    cy.get('[contenteditable]')
+      .type('{leftArrow}' + '{backspace}'.repeat(4));
+
+    cy.findByTestId('options-list');
+    cy.findByTestId('option-item-2');
+
+    cy.get('[contenteditable]')
+      .type('{downArrow}'.repeat(3) + '{enter}');
+
+    cy.findByText('And what about');
+    cy.findByText('#biopsy');
+    cy.findByText('?');
+
+    cy.findByTestId('options-list')
+      .should('not.be.visible');
+  });
 });
