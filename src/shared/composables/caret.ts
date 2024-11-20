@@ -1,6 +1,11 @@
 import type { Ref } from 'vue';
 
 export function useCaret (elementRef: Ref<HTMLElement | null>) {
+  function getElement () {
+    return window.getSelection()
+      ?.anchorNode
+      ?.parentElement || null;
+  }
   function getPosition () {
     if (!elementRef.value) {
       return 0;
@@ -19,7 +24,6 @@ export function useCaret (elementRef: Ref<HTMLElement | null>) {
 
     return rangeClone.toString().length;
   }
-
   function setPosition (offset: number) {
     if (!elementRef.value) {
       return;
@@ -72,6 +76,7 @@ export function useCaret (elementRef: Ref<HTMLElement | null>) {
   }
 
   return {
+    getElement,
     getPosition,
     setPosition,
   };

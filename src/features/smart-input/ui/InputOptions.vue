@@ -1,7 +1,14 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   options: string[]
-}>();
+  matchOption?: string;
+}>(), {
+  matchOption: '',
+});
+
+function match (source: string, option: string) {
+  return option.slice(source.length);
+}
 </script>
 
 <template>
@@ -12,7 +19,8 @@ defineProps<{
       class="options-item"
       tabindex="-1"
     >
-      {{ item }}
+      <span class="font-bold" v-text="matchOption" />
+      <span v-text="match(matchOption, item)" />
     </button>
   </div>
 </template>

@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { nextTick, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 
 import { useCaret, useStringHash } from '~/shared/composables';
+import { getElementPositionToParent } from '~/shared/utils';
 
 import { useMarkdown } from '../composables';
+import { markdownMap } from '../model';
+import type { Markdown } from '../model';
 import InputOptions from './InputOptions.vue';
 
 const inputRef = ref<HTMLElement | null>(null);
@@ -15,7 +18,25 @@ const userInput = defineModel<string>({
 });
 const formattedUserInput = markdown.transform(userInput);
 const inputHash = useStringHash(userInput);
+
 const options = ref<string[]>([]);
+const lastOptionsMatch = ref('');
+const isOptionsOpened = ref(false);
+const optionsXPosition = ref(0);
+const optionsPositionReset = () => {
+  isOptionsOpened.value = false;
+  optionsXPosition.value = 0;
+};
+
+const isExactOptionMatch = computed(() => (
+  options.value.length === 1 &&
+    lastOptionsMatch.value === options.value[0]
+));
+const isOptionsVisible = computed(() => (
+  isOptionsOpened.value &&
+  options.value.length &&
+  !isExactOptionMatch.value
+));
 
 function onInput (event: Event) {
   const lastCaretPosition = caret.getPosition();
@@ -25,7 +46,52 @@ function onInput (event: Event) {
   nextTick(() => {
     // Set the caret to the same position as before the update
     caret.setPosition(lastCaretPosition);
+    onCaretMove();
   });
+}
+async function onCaretMove () {
+  const element = caret.getElement();
+  if (!element) {
+    optionsPositionReset();
+    return;
+  }
+
+  const markdownType = element.getAttribute('data-markdown-type');
+  if (!markdownType) {
+    optionsPositionReset();
+    return;
+  }
+
+  const markdownParams = markdownMap.find(item => item.name === markdownType);
+  if (
+    !markdownParams ||
+    !markdownParams.withOptions ||
+    !markdownParams.service
+  ) {
+    optionsPositionReset();
+    return;
+  }
+
+  await setOptionsState(element, markdownParams as Required<Markdown>);
+}
+async function setOptionsState (element: HTMLElement, markdownParams: Required<Markdown>) {
+  const tag = element.textContent?.trim() || '';
+  const { left } = getElementPositionToParent(element);
+  const tagValue = tag.replace(/\W+/g, '');
+  const openOptions = () => {
+    optionsXPosition.value = left;
+    isOptionsOpened.value = true;
+  };
+
+  if (lastOptionsMatch.value === tagValue) {
+    openOptions();
+    return;
+  }
+
+  lastOptionsMatch.value = tagValue;
+  options.value = await markdownParams.service.findMatching(tagValue);
+
+  openOptions();
 }
 </script>
 
@@ -34,6 +100,8 @@ function onInput (event: Event) {
     ref="inputRef"
     class="smart-input"
     @input="onInput"
+    @keydown.left="onCaretMove"
+    @keydown.right="onCaretMove"
     @paste.prevent
     @keydown.enter.prevent
     @keydown.up.prevent
@@ -63,7 +131,10 @@ function onInput (event: Event) {
     </div>
 
     <InputOptions
+      v-show="isOptionsVisible"
       class="input-options"
+      :style="{ left: `${optionsXPosition}px` }"
+      :match-option="lastOptionsMatch"
       :options="options"
     />
   </div>

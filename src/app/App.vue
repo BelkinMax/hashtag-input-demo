@@ -3,7 +3,7 @@ import { ref } from 'vue';
 
 import { SmartInput } from '~/features/smart-input';
 
-const userInput = ref('Hi #everyone! What do you think about #this?');
+const userInput = ref('Hi #everyone! What do you think about #gastroenterology?');
 </script>
 
 <template>
