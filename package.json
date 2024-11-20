@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
-    "test:unit": "vitest",
-    "test:browser": "cypress open --component --browser=chrome",
+    "test:unit": "vitest run",
+    "test:browser": "cypress run --component --browser=chrome",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --fix"

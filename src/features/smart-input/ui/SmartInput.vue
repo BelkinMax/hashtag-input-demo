@@ -59,6 +59,23 @@ function onDelete (event: KeyboardEvent) {
     event.preventDefault();
   }
 }
+function onEnter () {
+  const element = caret.getElement();
+  if (!element || !isOptionsVisible.value) {
+    return;
+  }
+
+  const selectedOption = options.value[0];
+  const currentContent = element.textContent;
+  if (!currentContent) {
+    return;
+  }
+
+  setContent(
+    element,
+    currentContent.replace(/\w+/g, selectedOption)
+  );
+}
 async function onCaretMove () {
   const element = caret.getElement();
   if (!element) {
@@ -103,6 +120,16 @@ async function setOptionsState (element: HTMLElement, markdownParams: Required<M
 
   openOptions();
 }
+function setContent (element: HTMLElement, content: string) {
+  element.textContent = content;
+
+  nextTick(() => {
+    const caretPosition = caret.getPosition();
+
+    caret.setPosition(caretPosition + content.length);
+    onCaretMove();
+  });
+}
 </script>
 
 <template>
@@ -113,8 +140,8 @@ async function setOptionsState (element: HTMLElement, markdownParams: Required<M
     @keydown.left="onCaretMove"
     @keydown.right="onCaretMove"
     @keydown.delete="onDelete"
+    @keydown.enter.prevent="onEnter"
     @paste.prevent
-    @keydown.enter.prevent
     @keydown.up.prevent
     @keydown.down.prevent
   >
